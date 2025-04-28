@@ -19,19 +19,6 @@ builder.Services.AddTransient<IConsultaRepository, ConsultaRepository>();
 builder.Services.AddTransient<IMedicoService, MedicoService>();
 builder.Services.AddTransient<IConsultaService, ConsultaService>();
 
-builder.Services.AddAuthentication()
-    .AddJwtBearer(options =>
-    {
-        options.Authority = "https://localhost:5001";
-        options.TokenValidationParameters.ValidateAudience = false;
-    });
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("ApiScope", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.RequireClaim("scope", "MedVoll.WebAPI");
-    });
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
