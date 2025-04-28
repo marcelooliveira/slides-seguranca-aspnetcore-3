@@ -25,6 +25,8 @@ namespace MedVoll.Web.Services
 
         protected async Task<T> GetAsync<T>(string uri, params object[] param)
         {
+            await SetToken();
+
             string requestUri =
                 string.Format(new Uri(new Uri(_baseUri), uri).ToString(), param);
 
@@ -39,12 +41,16 @@ namespace MedVoll.Web.Services
 
         protected async Task<T> PutOrPostAsync<T>(string uri, object content)
         {
+            await SetToken();
+
             HttpVerbMethod httpVerbMethod = new HttpVerbMethod(_httpClient.PutAsync);
             return await PutOrPostAsync<T>(uri, content, httpVerbMethod);
         }
 
         protected async Task DeleteAsync<T>(string uri, params object[] param)
         {
+            await SetToken();
+
             string requestUri =
                 string.Format(new Uri(new Uri(_baseUri), uri).ToString(), param);
 
@@ -58,6 +64,8 @@ namespace MedVoll.Web.Services
 
         private async Task<T> PutOrPostAsync<T>(string uri, object content, HttpVerbMethod httpVerbMethod)
         {
+            await SetToken();
+
             var jsonIn = JsonConvert.SerializeObject(content);
             var stringContent = new StringContent(jsonIn, Encoding.UTF8, "application/json");
 
@@ -69,6 +77,12 @@ namespace MedVoll.Web.Services
             }
             var jsonOut = await httpResponse.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(jsonOut);
+        }
+
+        private async Task SetToken()
+        {
+            var accessToken = await _httpContext.GetTokenAsync("access_token");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
         }
     }
 }

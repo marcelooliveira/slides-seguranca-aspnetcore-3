@@ -2,7 +2,7 @@ using MedVoll.Web.Filters;
 using MedVoll.Web.Interfaces;
 using MedVoll.Web.Services;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Net.Http;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +25,46 @@ builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton(typeof(HttpClient), httpClient);
 builder.Services.AddTransient<IMedVollApiService, MedVollApiService>();
 
+JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
 builder.Services.AddRazorPages();
+
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "oidc";
+    })
+    .AddCookie("Cookies", options =>
+    {
+        options.Cookie.Name = "VollMedAuthCookie";
+        options.LoginPath = "/Account/Login";
+        options.AccessDeniedPath = "/Account/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+        options.SlidingExpiration = true;
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
+    })
+    .AddOpenIdConnect("oidc", options =>
+    {
+        options.Authority = builder.Configuration["MedVoll.Identity.Url"];
+
+        options.ClientId = "MedVoll.Web";
+        options.ClientSecret = "secret";
+        options.ResponseType = "code";
+
+        options.Scope.Clear();
+        options.Scope.Add("openid");
+        options.Scope.Add("profile");
+        options.Scope.Add("MedVoll.WebAPI");
+
+        options.GetClaimsFromUserInfoEndpoint = true;
+
+        options.MapInboundClaims = false; // Don't rename claim types
+
+        options.SaveTokens = true;
+    });
 
 var app = builder.Build();
 
@@ -42,6 +81,10 @@ else
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
