@@ -23,6 +23,7 @@ HttpClient httpClient = new HttpClient()
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddSingleton(typeof(HttpClient), httpClient);
+builder.Services.AddTransient<IMedVollApiService, MedVollApiService>();
 
 builder.Services.AddRazorPages();
 

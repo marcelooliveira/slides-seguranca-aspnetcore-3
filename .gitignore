@@ -409,3 +409,5 @@ FodyWeavers.xsd
 /MedVoll.WebAPI/vollmed.db
 /MedVoll.Identity/AspIdUsers.db-shm
 /MedVoll.Identity/AspIdUsers.db-wal
+/MedVoll.WebAPI/vollmed.db-shm
+/MedVoll.WebAPI/vollmed.db-wal
