@@ -20,12 +20,9 @@ namespace MedVoll.Web.Services
             public static string ListarMedicosPorEspecialidade = "/api/Medico/especialidade";
         }
 
-        public MedVollApiService(
-            IConfiguration configuration
-            , HttpClient httpClient)
-            : base(configuration, httpClient)
+        public MedVollApiService(IConfiguration configuration, IHttpClientFactory httpClientFactory)
+            : base(configuration, httpClientFactory)
         {
-            _baseUri = _configuration["MedVoll.WebApi.Url"];
         }
 
         public IMedVollApiService WithContext(HttpContext context)
