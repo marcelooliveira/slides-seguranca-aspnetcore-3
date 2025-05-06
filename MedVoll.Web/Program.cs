@@ -14,15 +14,19 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add<ExceptionHandlerFilter>();
 });
 
-var uri = new Uri(builder.Configuration["MedVoll.WebApi.Url"]);
-HttpClient httpClient = new HttpClient()
-{
-    BaseAddress = uri
-};
+var httpClientUrl = builder.Configuration["MedVoll.WebApi.Url"];
+var httpClientName = builder.Configuration["MedVoll.WebApi.Name"];
+
+builder.Services.AddHttpClient(
+    httpClientName,
+    client =>
+    {
+        // Set the base address of the named client.
+        client.BaseAddress = new Uri(httpClientUrl);
+    });
 
 builder.Services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
-builder.Services.AddSingleton(typeof(HttpClient), httpClient);
 builder.Services.AddTransient<IMedVollApiService, MedVollApiService>();
 
 builder.Services.AddRazorPages();

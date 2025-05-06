@@ -22,10 +22,9 @@ namespace MedVoll.Web.Services
 
         public MedVollApiService(
             IConfiguration configuration
-            , HttpClient httpClient)
-            : base(configuration, httpClient)
+            , IHttpClientFactory httpClientFactory)
+            : base(configuration, httpClientFactory)
         {
-            _baseUri = _configuration["MedVoll.WebApi.Url"];
         }
 
         public IMedVollApiService WithContext(HttpContext context)
